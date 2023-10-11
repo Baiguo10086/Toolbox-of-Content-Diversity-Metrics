@@ -1,5 +1,5 @@
+from abc import ABC, abstractmethod
+from typing import Set
 
-
-class Model:
-    def __init__(self) -> None:
-        pass
+class Model(ABC):
+    pass
