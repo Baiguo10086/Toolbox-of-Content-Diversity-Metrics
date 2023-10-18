@@ -3,6 +3,8 @@ from diversity.average_diversity import average_diversity
 import numpy as np
 from diversity.hexbinGraph import draw_hexbin
 
+import logging
+logger= logging.getLogger(__name__)
 
 
 sample_level1=GameLevel2D(list([list([1,2,3]),list([2,3,4])]))
@@ -25,3 +27,16 @@ y = 'y'
 data = np.random.random((2000, 2))
 data = data.tolist()
 draw_hexbin(x, y, data)
+
+
+try:
+    GameLevel2D.calculate_leniency(sample_level1,{1:1,2:2,3:3},allow_undefined=False)
+except Exception as e:
+    logger.warning(f"e:{e}")
+    
+    
+print(GameLevel2D.calculate_leniency(sample_level1,{1:1,2:2,3:3}))
+    
+print(GameLevel2D.calculate_leniency(sample_level1,{1:1,2:2,3:3,4:4},allow_undefined=False))
+    
+    
