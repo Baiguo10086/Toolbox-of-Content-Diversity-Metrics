@@ -1,5 +1,3 @@
-from model.game_level_2d import GameLevel2D
-from diversity.average_diversity import average_diversity_by_difference,average_diversity_by_value
 import numpy as np
 from graph.hexbin_graph import draw_hexbin
 
