@@ -1,7 +1,7 @@
-from model.GameLevel2D import GameLevel2D
+from model.game_level_2d import GameLevel2D
 from diversity.average_diversity import average_diversity
 import numpy as np
-from diversity.hexbinGraph import draw_hexbin
+from graph.hexbin_graph import draw_hexbin
 
 import logging
 logger= logging.getLogger(__name__)
