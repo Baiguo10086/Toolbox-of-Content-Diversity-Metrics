@@ -1,5 +1,5 @@
 from model.game_level_2d import GameLevel2D
-from model.game_trace_2d import GameOperation
+from model.game_trace_2d import GameOperationSequence
 from diversity.average import average_of_difference,average_of_value
 from diversity.accumulate_diversity import accumulate_by_coefficients
 
@@ -44,16 +44,16 @@ print(f"accumulate result:{accumulate_by_coefficients(functions=functions,object
 print(f"real result:{average_of_value(GameLevel2D.calculate_leniency,dict)(level_set1)+average_of_difference(GameLevel2D.calculate_different_elements)(level_set1)*2}")
 
 
-trace1 = GameOperation([(0,1),(1,2),(2,3)])
-trace2 = GameOperation([(0,1),(2,3),(1,2)])
-trace3 = GameOperation([(0,1),(1,3),(2,2)])
-trace4 = GameOperation([(0,1),(1,3),(2,2),(3,3)])
-trace5 = GameOperation([(0,0),(1,0),(2,0),(3,0),(4,0)])
+trace1 = GameOperationSequence([(0,1),(1,2),(2,3)])
+trace2 = GameOperationSequence([(0,1),(2,3),(1,2)])
+trace3 = GameOperationSequence([(0,1),(1,3),(2,2)])
+trace4 = GameOperationSequence([(0,1),(1,3),(2,2),(3,3)])
+trace5 = GameOperationSequence([(0,0),(1,0),(2,0),(3,0),(4,0)])
 
-print(GameOperation.calculate_minimum_edit_distance(trace1,trace2))
-print(GameOperation.calculate_minimum_edit_distance(trace1,trace3))
-print(GameOperation.calculate_minimum_edit_distance(trace1,trace4))
-print(GameOperation.calculate_minimum_edit_distance(trace1,trace5))
+print(GameOperationSequence.calculate_minimum_edit_distance(trace1,trace2))
+print(GameOperationSequence.calculate_minimum_edit_distance(trace1,trace3))
+print(GameOperationSequence.calculate_minimum_edit_distance(trace1,trace4))
+print(GameOperationSequence.calculate_minimum_edit_distance(trace1,trace5))
 
 trace_set1=[trace1,trace2,trace3,trace4,trace5]
-print(average_of_difference(GameOperation.calculate_minimum_edit_distance)(trace_set1))
+print(average_of_difference(GameOperationSequence.calculate_minimum_edit_distance)(trace_set1))

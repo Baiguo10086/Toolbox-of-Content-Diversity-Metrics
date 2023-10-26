@@ -2,7 +2,7 @@
 from common.model import Model
 from typing import List,Tuple
 
-class GameOperation(Model):
+class GameOperationSequence(Model):
     operations: List[Tuple[float,int]]
     def __init__(self,operations:List[Tuple[float,int]]):
         self.operations=sorted(operations)
