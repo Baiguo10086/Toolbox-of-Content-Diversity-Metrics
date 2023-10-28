@@ -2,6 +2,7 @@ from model.game_level_2d import GameLevel2D
 from model.game_trace_2d import GameOperationSequence
 from diversity.average import average_of_difference,average_of_value
 from diversity.accumulate_diversity import accumulate_by_coefficients
+from common.utils import calculate_average_vertical_distance,calculate_linear_regression_least_squares
 
 import logging
 logger= logging.getLogger(__name__)
@@ -28,6 +29,10 @@ dict= {1:1,2:2,3:3}
     
 print(GameLevel2D.calculate_leniency(sample_level1,{1:1,2:2,3:3}))
     
+    
+print(GameLevel2D.calculate_linearity(sample_level1,{1:1,2:2,3:3,4:0},calculate_average_vertical_distance))
+print(GameLevel2D.calculate_linearity(sample_level1,{1:1,2:2,3:3,4:0},calculate_linear_regression_least_squares))
+    
 print(GameLevel2D.calculate_leniency(sample_level1,{1:1,2:2,3:3,4:4},allow_undefined=False))
 
 
@@ -42,6 +47,8 @@ functions = [(average_of_value(GameLevel2D.calculate_leniency,dict),1),
 
 print(f"accumulate result:{accumulate_by_coefficients(functions=functions,objects=level_set1)}")
 print(f"real result:{average_of_value(GameLevel2D.calculate_leniency,dict)(level_set1)+average_of_difference(GameLevel2D.calculate_different_elements)(level_set1)*2}")
+
+
 
 
 trace1 = GameOperationSequence([(0,1),(1,2),(2,3)])
