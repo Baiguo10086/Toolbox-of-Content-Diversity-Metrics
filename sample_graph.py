@@ -1,5 +1,5 @@
 import numpy as np
-from graph.hexbin_graph import draw_hexbin
+from divtools.graph.hexbin_graph import draw_hexbin
 
 import logging
 logger= logging.getLogger(__name__)

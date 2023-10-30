@@ -24,7 +24,7 @@ class MarioLevel:
     pipe_intset = {6, 7, 8, 9}
     textures = [
         
-        pg.image.load(PROJ_DIR+f'/sample/mario/assets/tile-{i}.png')
+        pg.image.load(PROJ_DIR+f'/assets/tile-{i}.png')
         for i in range(num_tile_types)
     ]
 
@@ -62,9 +62,7 @@ class MarioLevel:
                 MarioLevel.textures[tile_id],
                 (j * tex_size, i * tex_size, tex_size, tex_size)
             )
-        if save_path:
-            # safe_path = get_path(save_path)
-            pg.image.save(img, save_path)
+        
         return img
 
     def save(self, fpath):
@@ -301,15 +299,57 @@ def traverse_level_files(path='levels/train'):
         name = lvl_path.split('\\')[-1][:-4]
         yield lvl, name
 
+def save_img(img,save_path) -> None:
+    # safe_path = get_path(save_path)
+    pg.image.save(img, save_path)
 
+def cal_line(x_list,y_list):
+    X = np.array(x_list)
+    Y = np.array(y_list)
+
+    mean_X = np.mean(X)
+    mean_Y = np.mean(Y)
+
+    numerator = np.sum((X - mean_X) * (Y - mean_Y))
+    denominator = np.sum((X - mean_X) ** 2)
+    slope = numerator / denominator
+    intercept = mean_Y - slope * mean_X
+
+    predicted_Y = slope * X + intercept
+    return slope,intercept
+BLACK=(0,0,0)
+RED = (255, 0, 0)
 if __name__ == '__main__':
     import os
+    
+    tex_size = MarioLevel.tex_size
     for i in range(1, 9):
         for j in range(1, 4):
             file_name = PROJ_DIR+'/levels/original/alldata/mario-{0}-{1}.txt'.format(i, j)
             if os.path.exists(file_name):
                 lvl = MarioLevel.from_txt(file_name)
-                print(lvl.to_num_arr())
+                level=GameLevel2D(lvl.to_num_arr().tolist())
                 
                 
-                lvl.to_img(PROJ_DIR+'/levels/original/alldata/mario-{0}-{1}.png'.format(i, j))
+                """ 
+                'c-i': {'X': 0, 'S': 1, '-': 2, '?': 3, 'Q': 4, 'E': 5, '<': 6,
+                '>': 7, '[': 8, ']': 9, 'o': 10}
+                """
+                value_dict={2:1,5:2,7:1,8:1}
+                print(GameLevel2D.calculate_leniency(obj=level,value_dict=value_dict))
+                
+                weight_dict={0:1,1:1,2:0,3:1,4:1,5:0,6:1,7:1,8:1,9:1,10:0}
+                x_list,y_list=level.get_barycentre(weight_dict)
+                
+                img = lvl.to_img()
+                for k in range(len(x_list)):
+                    x=x_list[k]
+                    y=y_list[k]    
+                    pg.draw.circle(img,RED,(x*tex_size+tex_size/2,y*tex_size-tex_size/2),5)
+                
+                k,b=cal_line(x_list,y_list)
+                st=(0,b*tex_size)
+                ed=(level.columns*tex_size,(k*level.columns+b)*tex_size)
+                pg.draw.line(img,BLACK,st,ed, 3)
+                
+                save_img(img,PROJ_DIR+'/levels/original/alldata/mario-{0}-{1}.png'.format(i, j))

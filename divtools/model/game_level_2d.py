@@ -41,7 +41,7 @@ class GameLevel2D(Model):
                     raise ValueError(f"object contain undefined value : {obj.map[x][y]}")
                 result+=value_dict.get(obj.map[x][y],0)
         
-        return result
+        return result/obj.rows/obj.columns
     
     def get_barycentre(self,value_dict:Dict[int,float])-> Tuple[List[float],List[float]]:
         def calculate_barycentre(grid:List[int],value_dict:[int,float])->float:
