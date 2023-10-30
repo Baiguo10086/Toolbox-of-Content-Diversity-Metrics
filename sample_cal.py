@@ -1,8 +1,8 @@
-from model.game_level_2d import GameLevel2D
-from model.game_trace_2d import GameOperationSequence
-from diversity.average import average_of_difference,average_of_value
-from diversity.accumulate_diversity import accumulate_by_coefficients
-from common.utils import calculate_average_vertical_distance,calculate_linear_regression_least_squares
+from divtools.model.game_level_2d import GameLevel2D
+from divtools.model.game_trace_2d import GameOperationSequence
+from divtools.diversity.average import average_of_difference,average_of_value
+from divtools.diversity.accumulate_diversity import accumulate_by_coefficients
+from divtools.common.utils import calculate_average_vertical_distance,calculate_linear_regression_least_squares
 
 import logging
 logger= logging.getLogger(__name__)

@@ -1,5 +1,5 @@
 
-from common.model import Model
+from divtools.common.model import Model
 from typing import List,Tuple
 
 class GameOperationSequence(Model):

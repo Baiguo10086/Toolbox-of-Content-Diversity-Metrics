@@ -1,5 +1,5 @@
 
-from common.model import Model
+from divtools.common.model import Model
 from typing import List,Callable,Tuple
 
 def accumulate_by_coefficients(functions:List[Tuple[Callable,float]],objects:List[Model]) -> float:
