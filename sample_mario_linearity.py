@@ -7,6 +7,7 @@ from enum import Enum
 from typing import Union, List, Dict
 from itertools import product
 from divtools.model.game_level_2d import GameLevel2D
+from divtools.common.utils import calculate_linear_regression_least_squares
 
 PROJ_DIR='d:/Desktop/Toolbox-of-Content-Diversity-Metrics'
 class MarioLevel:
@@ -322,34 +323,49 @@ RED = (255, 0, 0)
 if __name__ == '__main__':
     import os
     
+    value_list=[]
     tex_size = MarioLevel.tex_size
-    for i in range(1, 9):
-        for j in range(1, 4):
-            file_name = PROJ_DIR+'/levels/original/alldata/mario-{0}-{1}.txt'.format(i, j)
-            if os.path.exists(file_name):
-                lvl = MarioLevel.from_txt(file_name)
-                level=GameLevel2D(lvl.to_num_arr().tolist())
-                
-                
-                """ 
-                'c-i': {'X': 0, 'S': 1, '-': 2, '?': 3, 'Q': 4, 'E': 5, '<': 6,
-                '>': 7, '[': 8, ']': 9, 'o': 10}
-                """
-                value_dict={2:1,5:2,7:1,8:1}
-                print(GameLevel2D.calculate_leniency(obj=level,value_dict=value_dict))
-                
-                weight_dict={0:1,1:1,2:0,3:1,4:1,5:0,6:1,7:1,8:1,9:1,10:0}
-                x_list,y_list=level.get_barycentre(weight_dict)
-                
-                img = lvl.to_img()
-                """ for k in range(len(x_list)):
-                    x=x_list[k]
-                    y=y_list[k]    
-                    pg.draw.circle(img,RED,(x*tex_size+tex_size/2,y*tex_size-tex_size/2),5)
-                
-                k,b=cal_line(x_list,y_list)
-                st=(0,b*tex_size)
-                ed=(level.columns*tex_size,(k*level.columns+b)*tex_size)
-                pg.draw.line(img,BLACK,st,ed, 3)
-                 """
-                save_img(img,PROJ_DIR+'/levels/original/alldata/mario-{0}-{1}.png'.format(i, j))
+    data=[]
+    for i in range(99):
+        file_name = PROJ_DIR+f'/levels/original/linearity/mario-{i}.txt'
+        if os.path.exists(file_name):
+            lvl = MarioLevel.from_txt(file_name)
+            level=GameLevel2D(lvl.to_num_arr().tolist())
+            """ 
+            'c-i': {'X': 0, 'S': 1, '-': 2, '?': 3, 'Q': 4, 'E': 5, '<': 6,
+            '>': 7, '[': 8, ']': 9, 'o': 10}
+            """
+            
+            weight_dict={0:1,1:1,2:0,3:1,4:1,5:0,6:1,7:1,8:1,9:1,10:0}
+            x_list,y_list=level.get_barycentre(weight_dict)
+            
+            img = lvl.to_img()
+            for k in range(len(x_list)):
+                x=x_list[k]
+                y=y_list[k]    
+                pg.draw.circle(img,RED,(x*tex_size+tex_size/2,y*tex_size-tex_size/2),5)
+            
+            k,b=cal_line(x_list,y_list)
+            st=(0,b*tex_size)
+            ed=(level.columns*tex_size,(k*level.columns+b)*tex_size)
+            pg.draw.line(img,BLACK,st,ed, 3)
+            
+            save_img(img,PROJ_DIR+f'/levels/original/linearity/mario-{i}.png')
+            result=GameLevel2D.calculate_linearity(level,weight_dict,calculate_linear_regression_least_squares)
+            value_list.append((result,i))
+            data.append(result)
+    value_list=sorted(value_list)
+    print(value_list)
+    
+    import matplotlib.pyplot as plt
+
+    # 绘制直方图
+    plt.hist(data, bins=50, edgecolor='black')  # 可以调整 bins 的值来控制直方图的柱子数量
+    plt.title('Linearity')
+    plt.xlabel('值')
+    plt.ylabel('频数')
+
+    plt.show()
+    
+    
+        
