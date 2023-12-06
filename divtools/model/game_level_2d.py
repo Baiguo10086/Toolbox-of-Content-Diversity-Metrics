@@ -75,3 +75,15 @@ class GameLevel2D(Model):
             return 0
         
         return diff_func(x_barycentre,y_barycentre)
+    
+    @classmethod
+    def calculate_linearity_by_column(cls,slide_list:List,diff_func:Callable):
+        if not isinstance(slide_list,cls):
+            raise ValueError(f"object is not class of {cls.__name__}")
+        result=0
+        
+        for i in range(len(slide_list)-1):
+            result+=diff_func(slide_list[i-1],slide_list[i])
+        return result
+    
+    
