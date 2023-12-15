@@ -13,8 +13,8 @@ class _Edge:
 
 class _DisjointSet:
     parent:List[int]
-    def __init__(self,point_count:int) -> None:
-        self.parent=[i for i in range(point_count)]
+    def __init__(self,point_cnt:int) -> None:
+        self.parent=[i for i in range(point_cnt)]
     
     def get_parent(self,point:int) -> int:
         if self.parent[point]==point:
@@ -28,7 +28,7 @@ class _DisjointSet:
         if u!=v:
             self.parent[u]=v
         
-def nearest_better_cluster(points:List[Model],distance_function:Callable,phi:float=2) -> List[List[Model]]:
+def nearest_better_cluster(points:List[Model],distance_fn:Callable,phi:float=2) -> List[List[Model]]:
     n=len(points)
     if (n==0):
         return []
@@ -42,7 +42,7 @@ def nearest_better_cluster(points:List[Model],distance_function:Callable,phi:flo
     for point in range(n-1):
         nearest_point = point + 1 
         for other_point in range(point+1,n):
-            distance[point][other_point]=distance[other_point][point]=distance_function(point,other_point)
+            distance[point][other_point]=distance[other_point][point]=distance_fn(point,other_point)
             if distance[point][other_point]<distance[point][nearest_point]:
                 nearest_point=other_point
                 
