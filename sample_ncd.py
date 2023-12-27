@@ -6,7 +6,7 @@ import pygame as pg
 from typing import Union, List, Dict
 from itertools import product
 from divtools.model.game_level_2d import GameLevel2D
-from divtools.diversity import NCD
+from divtools.diversity import ncd
 
 PROJ_DIR = 'C:/Users/hui/Desktop/toolbox/Toolbox-of-Content-Diversity-Metrics'
 
@@ -168,8 +168,8 @@ if __name__ == '__main__':
     tex_size = MarioLevel.tex_size
     data = []
     levels = []
-    for i in range(1, 7):
-        file_name = f'C:/Users/hui/Desktop/toolbox/Toolbox-of-Content-Diversity-Metrics/levels/original/data1/mario-{i}-1.txt'
+    for i in range(1, 4):
+        file_name = f'C:/Users/hui/Desktop/toolbox/Toolbox-of-Content-Diversity-Metrics/levels/original/KL/mario-{i}.txt'
         if os.path.exists(file_name):
             lvl = MarioLevel.from_txt(file_name)
             level = GameLevel2D(lvl.to_num_arr().tolist())
@@ -177,13 +177,17 @@ if __name__ == '__main__':
             'c-i': {'X': 0, 'S': 1, '-': 2, '?': 3, 'Q': 4, 'E': 5, '<': 6,
             '>': 7, '[': 8, ']': 9, 'o': 10}
             """
-
+            print(level.map)
+            print(len(level.map))
+            print(len(level.map[0]))
             levels.append(level)
     result = 0
-    for i in range(len(levels)):
-        for j in range(i + 1, len(levels)):
-            result +=NCD.ncd(levels[i],levels[j])
-
-    print(result)
-
-    print("归一化压缩距离(NCD):", result/len(levels))
+    # for i in range(len(levels)):
+    #     for j in range(i + 1, len(levels)):
+    #         result +=NCD.ncd(levels[i],levels[j])
+    result = NCD.ncd(levels[0],levels[1])
+    print("归一化压缩距离(NCD):", result)
+    result = NCD.ncd(levels[0], levels[2])
+    print("归一化压缩距离(NCD):", result)
+    result = NCD.ncd(levels[1], levels[2])
+    print("归一化压缩距离(NCD):", result)

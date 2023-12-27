@@ -6,11 +6,30 @@ import pygame as pg
 from typing import Union, List, Dict
 from itertools import product
 from divtools.model.game_level_2d import GameLevel2D
-from divtools.diversity import KL
+from divtools.diversity import kl
+
+import glob
+import jpype
+import numpy as np
+import pygame as pg
+from math import ceil
+from enum import Enum
+from typing import Union, List, Dict
+from itertools import product
+from divtools.model.game_level_2d import GameLevel2D
+from jpype import JString
 
 PROJ_DIR = 'C:/Users/hui/Desktop/toolbox/Toolbox-of-Content-Diversity-Metrics'
 
+PRJROOT = 'C:/Users/hui/Desktop/toolbox/Toolbox-of-Content-Diversity-Metrics'
+# PRJROOT = "C:/Users/hui/Documents/Tencent Files/1305288768/FileRecv/mopcg/mopcg/"
 
+# JVMPath = "D:/java/jdk-11.0.11/bin/server/jvm.dll"
+# JVMPath = "C:/Users/hui/.jdks/corretto-11.0.11/bin/server/jvm.dll"
+JVMPath = "C:/Program Files/Java/jdk-16.0.1/bin/server/jvm.dll"
+
+
+# JVMPath = "C:/Program Files/Java/jdk-16.0.1/bin/server/jvm.dll"
 class MarioLevel:
     tex_size = 16
     height = 14
@@ -162,28 +181,193 @@ class MarioLevel:
         return res
 
 
+class MarioJavaAgents(Enum):
+    Baumgarten = 'agents.robinBaumgarten'
+
+    def __str__(self):
+        return self.value + '.Agent'
+
+
+class MarioProxy:
+    # __jmario = jpype.JClass("MarioProxy")()
+
+    def __init__(self):
+        if not jpype.isJVMStarted():
+            jpype.startJVM(
+                jpype.getDefaultJVMPath() if JVMPath is None else JVMPath,
+                f"-Djava.class.path={PRJROOT}Mario-AI-Framework.jar", '-Xmx1g'
+            )
+            """
+                -Xmx{size} set the heap size.
+            """
+        self.__proxy = jpype.JClass("MarioProxy")()
+
+    @staticmethod
+    def __extract_res(jresult):
+        return {
+            'status': str(jresult.getGameStatus().toString()),
+            'completing-ratio': float(jresult.getCompletionPercentage()),
+            '#kills': int(jresult.getKillsTotal()),
+            '#kills-by-fire': int(jresult.getKillsByFire()),
+            '#kills-by-stomp': int(jresult.getKillsByStomp()),
+            '#kills-by-shell': int(jresult.getKillsByShell()),
+            'trace': [
+                [float(item.getMarioX()), float(item.getMarioY())]
+                for item in jresult.getAgentEvents()
+            ],
+            'behavior': [
+                item.getActions() for item in jresult.getAgentEvents()
+            ]
+        }
+
+    def play_game(self, level: Union[str, MarioLevel]):
+        if type(level) == str:
+            jfilepath = JString(level)
+            jresult = self.__proxy.playGameFromTxt(jfilepath)
+        else:
+            jresult = self.__proxy.playGame(JString(str(level)))
+        return MarioProxy.__extract_res(jresult)
+
+    def simulate_game(self,
+                      level: Union[str, MarioLevel],
+                      agent: MarioJavaAgents = MarioJavaAgents.Baumgarten,
+                      render: bool = False
+                      ) -> Dict:
+        """
+        Run simulation with an agent for a given level
+        :param level: if type is str, must be path of a valid level file.
+        :param agent: type of the agent.
+        :param render: render or not.
+        :return: dictionary of the results.
+        """
+        # start_time = time.perf_counter()
+        jagent = jpype.JClass(str(agent))()
+        if type(level) == str:
+            level = MarioLevel.from_txt(level)
+        # real_time_limit_ms = 2 * (level.w * 15 + 1000)
+        real_time_limit_ms = int(3 if not render else 5)
+        jresult = self.__proxy.playGame(JString(str(level)), jagent, real_time_limit_ms, render)
+        # Refer to Mario-AI-Framework.engine.core.MarioResult, add more entries if need be.
+        return MarioProxy.__extract_res(jresult)
+
+    def simulate_long_game(self,
+                           level: Union[str, MarioLevel],
+                           agent: MarioJavaAgents = MarioJavaAgents.Baumgarten,
+                           k: float = 2., b: int = 200
+                           ) -> Dict:
+        # start_time = time.perf_counter()
+        ts = MarioLevel.tex_size
+        jagent = jpype.JClass(str(agent))()
+        if type(level) == str:
+            level = MarioLevel.from_txt(level)
+        reached_tile = 0
+        res = {'restarts': [], 'trace': []}
+        dx = 0
+        while reached_tile < level.w - 1:
+            jresult = self.__proxy.runGame(JString(str(level[:, reached_tile:])), jagent)
+            pyresult = MarioProxy.__extract_res(jresult)
+
+            reached = pyresult['trace'][-1][0]
+            reached_tile += ceil(reached / ts)
+            if pyresult['status'] != 'WIN':
+                res['restarts'].append(reached_tile)
+            res['trace'] += [[dx + item[0], item[1]] for item in pyresult['trace']]
+            dx = reached_tile * ts
+        return res
+
+    @staticmethod
+    def get_seg_infos(full_info, check_points=None):
+        restarts, trace = full_info['restarts'], full_info['trace']
+        W = MarioLevel.default_seg_width
+        ts = MarioLevel.tex_size
+        if check_points is None:
+            end = ceil(trace[-1][0] / ts)
+            check_points = [x for x in range(W, end, W)]
+            check_points.append(end)
+        res = [{'trace': [], 'playable': True} for _ in check_points]
+        s, e, i = 0, 0, 0
+        restart_pointer = 0
+        # dx = 0
+        while True:
+            while e < len(trace) and trace[e][0] < ts * check_points[i]:
+                if restart_pointer < len(restarts) and restarts[restart_pointer] < check_points[i]:
+                    res[i]['playable'] = False
+                    restart_pointer += 1
+                e += 1
+            x0 = trace[s][0]
+            res[i]['trace'] = [[item[0] - x0, item[1]] for item in trace[s:e]]
+            # x0, y0 = trace[s]
+            # res[i]['trace'] = [[item[0] - x0, item[1] - y0] for item in trace[s:e]]
+            # dx = ts * check_points[i]
+            i += 1
+            if i == len(check_points):
+                break
+            s = e
+        return res
+
+
+def level_sum(lvls) -> MarioLevel:
+    if type(lvls[0]) == MarioLevel:
+        concated_content = np.concatenate([l.content for l in lvls], axis=1)
+    else:
+        concated_content = np.concatenate([l for l in lvls], axis=1)
+    return MarioLevel(concated_content)
+
+
+def traverse_level_files(path='levels/train'):
+    for lvl_path in glob.glob(f'{path}\\*.txt'):
+        lvl = MarioLevel.from_txt(lvl_path)
+        name = lvl_path.split('\\')[-1][:-4]
+        yield lvl, name
+
+
+def save_img(img, save_path) -> None:
+    # safe_path = get_path(save_path)
+    pg.image.save(img, save_path)
+
+
+def cal_line(x_list, y_list):
+    X = np.array(x_list)
+    Y = np.array(y_list)
+
+    mean_X = np.mean(X)
+    mean_Y = np.mean(Y)
+
+    numerator = np.sum((X - mean_X) * (Y - mean_Y))
+    denominator = np.sum((X - mean_X) ** 2)
+    slope = numerator / denominator
+    intercept = mean_Y - slope * mean_X
+    return slope, intercept
+
+
 if __name__ == '__main__':
 
     value_list = []
     tex_size = MarioLevel.tex_size
     data = []
     levels = []
-    for i in range(1, 7):
-        file_name = f'C:/Users/hui/Desktop/toolbox/Toolbox-of-Content-Diversity-Metrics/levels/original/data1/mario-{i}-1.txt'
+    for i in range(1, 4):
+        file_name = f'C:/Users/hui/Desktop/toolbox/Toolbox-of-Content-Diversity-Metrics/levels/original/KL/mario-{i}.txt'
         if os.path.exists(file_name):
             lvl = MarioLevel.from_txt(file_name)
             level = GameLevel2D(lvl.to_num_arr().tolist())
+            print(lvl.to_num_arr().tolist())
             """ 
             'c-i': {'X': 0, 'S': 1, '-': 2, '?': 3, 'Q': 4, 'E': 5, '<': 6,
             '>': 7, '[': 8, ']': 9, 'o': 10}
             """
-
             levels.append(level)
-    result = 0
-    for i in range(len(levels)):
-        for j in range(i + 1, len(levels)):
-            result += KL.KL_Divergence_2d(levels[i], levels[j], 2)
 
+            img = lvl.to_img()
+            save_img(img, PROJ_DIR + f'/levels/original/KL/mario-{i}.png')
+    result = 0
+    print(levels)
+    # for i in range(len(levels)):
+    #     for j in range(i + 1, len(levels)):
+    #         result += KL.KL_Divergence_2d(levels[i], levels[j], 2)
+    result = KL.KL_Divergence_2d(levels[0], levels[1], 2)
+    result2 = KL.KL_Divergence_2d(levels[0], levels[2], 2)
+    result3 = KL.KL_Divergence_2d(levels[1], levels[2], 2)
     print(result)
 
-    print("平均KL-divergence:",result/len(levels))
+    print("平均KL-divergence:{0} , {1}, {2}".format(result, result2, result3))
