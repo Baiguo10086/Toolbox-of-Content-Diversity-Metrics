@@ -57,10 +57,6 @@ trace3 = GameOperationSequence([(0,1),(1,3),(2,2)])
 trace4 = GameOperationSequence([(0,1),(1,3),(2,2),(3,3)])
 trace5 = GameOperationSequence([(0,0),(1,0),(2,0),(3,0),(4,0)])
 
-print(GameOperationSequence.calculate_minimum_edit_distance(trace1,trace2))
-print(GameOperationSequence.calculate_minimum_edit_distance(trace1,trace3))
-print(GameOperationSequence.calculate_minimum_edit_distance(trace1,trace4))
-print(GameOperationSequence.calculate_minimum_edit_distance(trace1,trace5))
 
 trace_set1=[trace1,trace2,trace3,trace4,trace5]
 print(average_of_difference(GameOperationSequence.calculate_minimum_edit_distance)(trace_set1))
