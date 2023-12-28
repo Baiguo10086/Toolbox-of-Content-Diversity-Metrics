@@ -30,11 +30,11 @@ def calculate_constraint_minimum_edit_distance(list1:List, list2:List, differenc
     for y in range(m+1):
         dp[0][y]=y
     for x in range(n+1):
-        for y in range(max(0,x-limit),min(m,x+limit)+1):
+        for y in range(m+1):
             if x+1<=n:
                 dp[x+1][y]=min(dp[x+1][y],dp[x][y]+1)
             if y+1<=m:
                 dp[x][y+1]=min(dp[x][y+1],dp[x][y]+1)
-            if x+1<=n and y+1<=m:
+            if x+1<=n and y+1<=m and abs(x-y)<=limit:
                 dp[x+1][y+1]=min(dp[x+1][y+1],dp[x][y]+difference_fn(list1[x],list2[y]))
     return dp[n][m]
