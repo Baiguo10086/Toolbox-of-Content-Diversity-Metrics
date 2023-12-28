@@ -18,4 +18,5 @@ class Test_distance():
         
         assert calculate_minimum_edit_distance(trace1,trace2,difference_fn)==2
         assert calculate_minimum_edit_distance(trace2,trace3,difference_fn)==0
+        assert calculate_minimum_edit_distance(trace2,trace4,difference_fn)==1
 
