@@ -4,7 +4,8 @@ from divtools.common.model import Model
 
 
 class _Edge:
-    u,v:int
+    u:int
+    v:int
     distance:float
     def __init__(self,u:int,v:int,distance:float) -> None:
         self.u=u
@@ -42,7 +43,7 @@ def nearest_better_cluster(points:List[Model],distance_fn:Callable,phi:float=2) 
     for point in range(n-1):
         nearest_point = point + 1 
         for other_point in range(point+1,n):
-            distance[point][other_point]=distance[other_point][point]=distance_fn(point,other_point)
+            distance[point][other_point]=distance[other_point][point]=distance_fn(points[point],points[other_point])
             if distance[point][other_point]<distance[point][nearest_point]:
                 nearest_point=other_point
                 
