@@ -10,7 +10,8 @@ class Position():
     pass
 
 class Position2D(Position):
-    x,y: float
+    x: float
+    y: float
     def __init__(self,position) -> None:
         self.x = position[0]
         self.y = position[1]
