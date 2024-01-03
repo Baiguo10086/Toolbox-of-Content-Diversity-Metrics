@@ -4,7 +4,7 @@ import gzip
 from divtools.model.game_level_2d import GameLevel2D
 
 def compress(data):
-    """使用zlib压缩数据."""
+    """使用zlib、gzip压缩数据."""
     return gzip.compress(data)
 
 
