@@ -1,6 +1,7 @@
 from divtools.common.model import Model
 from typing import List, Dict, Tuple, Callable
 import math
+from divtools.common.utils import read_txt
 
 
 class GameLevel2D(Model):
@@ -8,12 +9,23 @@ class GameLevel2D(Model):
     columns: int
     map: List[List[int]]
     metrics: Dict
+    # 父数据集，当前生成的数据的原数据集
+    label: str
+    # 这个段的名字
+    name: str
 
-    def __init__(self, map: List[List[int]]):
+    tile_pattern: Dict
+
+    def __init__(self, map: List[List[int]], label: str = "", name: str = ""):
         self.map = map
         self.rows = len(map)
         self.columns = len(map[0])
         self.metrics = {}
+        self.label = label
+        self.name = name
+        self.tile_pattern = {}
+
+
 
     @classmethod
     def calculate_different_elements(cls, obj1, obj2) -> int:
@@ -57,7 +69,6 @@ class GameLevel2D(Model):
                     min_pair = (objs[i], objs[j])
 
         return min_distance, min_pair
-
 
     @classmethod
     def calculate_leniency(cls, obj, value_dict: Dict[int, float], allow_undefined: bool = True) -> float:
@@ -112,3 +123,7 @@ class GameLevel2D(Model):
         for i in range(len(slide_list) - 1):
             result += diff_func(slide_list[i], slide_list[i + 1])
         return result
+
+    @classmethod
+    def read(cls, file_path: str, rules: dict, label: str = "", name: str = ""):
+        return cls(read_txt(file_path, rules), label, name)

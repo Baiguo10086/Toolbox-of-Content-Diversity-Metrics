@@ -9,7 +9,9 @@ from itertools import product
 from divtools.model.game_level_2d import GameLevel2D
 from divtools.common.utils import calculate_linear_regression_least_squares
 
-PROJ_DIR='d:/Desktop/Toolbox-of-Content-Diversity-Metrics'
+PROJ_DIR = 'C:/Users/hui/Desktop/toolbox/Toolbox-of-Content-Diversity-Metrics'
+
+
 class MarioLevel:
     tex_size = 16
     height = 14
@@ -24,8 +26,8 @@ class MarioLevel:
     pipe_charset = {'<', '>', '[', ']'}
     pipe_intset = {6, 7, 8, 9}
     textures = [
-        
-        pg.image.load(PROJ_DIR+f'/assets/tile-{i}.png')
+
+        pg.image.load(PROJ_DIR + f'/assets/tile-{i}.png')
         for i in range(num_tile_types)
     ]
 
@@ -63,7 +65,7 @@ class MarioLevel:
                 MarioLevel.textures[tile_id],
                 (j * tex_size, i * tex_size, tex_size, tex_size)
             )
-        
+
         return img
 
     def save(self, fpath):
@@ -300,11 +302,13 @@ def traverse_level_files(path='levels/train'):
         name = lvl_path.split('\\')[-1][:-4]
         yield lvl, name
 
-def save_img(img,save_path) -> None:
+
+def save_img(img, save_path) -> None:
     # safe_path = get_path(save_path)
     pg.image.save(img, save_path)
 
-def cal_line(x_list,y_list):
+
+def cal_line(x_list, y_list):
     X = np.array(x_list)
     Y = np.array(y_list)
 
@@ -315,34 +319,34 @@ def cal_line(x_list,y_list):
     denominator = np.sum((X - mean_X) ** 2)
     slope = numerator / denominator
     intercept = mean_Y - slope * mean_X
-    return slope,intercept
+    return slope, intercept
 
 
-BLACK=(0,0,0)
+BLACK = (0, 0, 0)
 RED = (255, 0, 0)
 if __name__ == '__main__':
     import os
-    
-    value_list=[]
+
+    value_list = []
     tex_size = MarioLevel.tex_size
-    data=[]
+    data = []
     for i in range(99):
-        file_name = PROJ_DIR+f'/levels/original/linearity/mario-{i}.txt'
+        file_name = PROJ_DIR + f'/levels/original/linearity/mario-{i}.txt'
         if os.path.exists(file_name):
             lvl = MarioLevel.from_txt(file_name)
-            level=GameLevel2D(lvl.to_num_arr().tolist())
+            level = GameLevel2D(lvl.to_num_arr().tolist())
             """ 
             'c-i': {'X': 0, 'S': 1, '-': 2, '?': 3, 'Q': 4, 'E': 5, '<': 6,
             '>': 7, '[': 8, ']': 9, 'o': 10}
             """
-            
-            value_dict={2:1,5:5,7:1,8:1}
-            result=GameLevel2D.calculate_leniency(level,value_dict)
-            value_list.append((result,i))
+
+            value_dict = {2: 1, 5: 5, 7: 1, 8: 1}
+            result = GameLevel2D.calculate_leniency(level, value_dict)
+            value_list.append((result, i))
             data.append(result)
-    value_list=sorted(value_list)
+    value_list = sorted(value_list)
     print(value_list)
-    
+
     import matplotlib.pyplot as plt
 
     # 绘制直方图
@@ -352,6 +356,3 @@ if __name__ == '__main__':
     plt.ylabel('count')
 
     plt.show()
-    
-    
-        

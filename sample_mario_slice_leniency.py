@@ -7,9 +7,19 @@ from enum import Enum
 from typing import Union, List, Dict
 from itertools import product
 from divtools.model.game_level_2d import GameLevel2D
+from jpype import JString
 from divtools.common.utils import calculate_linear_regression_least_squares
 
-PROJ_DIR='d:/Desktop/Toolbox-of-Content-Diversity-Metrics'
+PROJ_DIR = 'C:/Users/hui/Desktop/toolbox/Toolbox-of-Content-Diversity-Metrics'
+
+PRJROOT = 'C:/Users/hui/Desktop/toolbox/Toolbox-of-Content-Diversity-Metrics'
+# PRJROOT = "C:/Users/hui/Documents/Tencent Files/1305288768/FileRecv/mopcg/mopcg/"
+
+# JVMPath = "D:/java/jdk-11.0.11/bin/server/jvm.dll"
+# JVMPath = "C:/Users/hui/.jdks/corretto-11.0.11/bin/server/jvm.dll"
+JVMPath = "C:/Program Files/Java/jdk-16.0.1/bin/server/jvm.dll"
+# JVMPath = "C:/Program Files/Java/jdk-16.0.1/bin/server/jvm.dll"
+
 class MarioLevel:
     tex_size = 16
     height = 14
@@ -373,7 +383,7 @@ if __name__ == '__main__':
     tex_size = MarioLevel.tex_size
     data=[]
     for i in range(99):
-        file_name = PROJ_DIR+f'/levels/original/linearity/mario-{i}.txt'
+        file_name = PROJ_DIR+f'/levels/original/data1/mario-1-1.txt'
         if os.path.exists(file_name):
             lvl = MarioLevel.from_txt(file_name)
             level=GameLevel2D(lvl.to_num_arr().tolist())

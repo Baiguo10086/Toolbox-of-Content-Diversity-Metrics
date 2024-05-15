@@ -1,12 +1,10 @@
 import os
-
-import numpy as np
-import pygame as pg
-
-from typing import Union, List, Dict
-from itertools import product
-from divtools.model.game_level_2d import GameLevel2D
-from divtools.diversity import kl
+from similarity import get_similar_rows
+from similarity import get_similar_cols
+from similarity import similarity
+from symmetry import total_symmetry
+from divtools.graph.hexbin_graph import draw_hexbin
+# import numpy as np
 
 import glob
 import jpype
@@ -346,28 +344,60 @@ if __name__ == '__main__':
     tex_size = MarioLevel.tex_size
     data = []
     levels = []
-    for i in range(1, 4):
-        file_name = f'C:/Users/hui/Desktop/toolbox/Toolbox-of-Content-Diversity-Metrics/levels/original/KL/mario-{i}.txt'
+    levels_t= []
+    for i in range(0,30):
+        file_name = f'C:/Users/hui/Desktop/toolbox/Toolbox-of-Content-Diversity-Metrics/levels/original/linearity/mario-{i}.txt'
         if os.path.exists(file_name):
             lvl = MarioLevel.from_txt(file_name)
             level = GameLevel2D(lvl.to_num_arr().tolist())
-            print(lvl.to_num_arr().tolist())
+            # print(lvl.to_num_arr().tolist())
             """ 
             'c-i': {'X': 0, 'S': 1, '-': 2, '?': 3, 'Q': 4, 'E': 5, '<': 6,
             '>': 7, '[': 8, ']': 9, 'o': 10}
             """
             levels.append(level)
 
-            img = lvl.to_img()
-            save_img(img, PROJ_DIR + f'/levels/original/KL/mario-{i}.png')
+    for i in range(30, 100):
+        file_name = f'C:/Users/hui/Desktop/toolbox/Toolbox-of-Content-Diversity-Metrics/levels/original/linearity/mario-{i}.txt'
+        if os.path.exists(file_name):
+            lvl = MarioLevel.from_txt(file_name)
+            level = GameLevel2D(lvl.to_num_arr().tolist())
+            # print(lvl.to_num_arr().tolist())
+            """ 
+            'c-i': {'X': 0, 'S': 1, '-': 2, '?': 3, 'Q': 4, 'E': 5, '<': 6,
+            '>': 7, '[': 8, ']': 9, 'o': 10}
+            """
+            levels_t.append(level)
+            # img = lvl.to_img()
+            # save_img(img, PROJ_DIR + f'/levels/original/linearity/mario-{i}.png')
     result = 0
-    print(levels)
+    # print(levels)
+    rows = get_similar_rows(levels_t)
+    cols = get_similar_cols(levels_t)
+    similarity_res = []
+    symmetry_res = []
+    for g in levels:
+        similarity_res.append(similarity(g,rows,cols))
+        symmetry_res.append(total_symmetry(g))
+    print(len(similarity_res))
+    print(len(symmetry_res))
+    x = "similarity"
+    y = 'symmetry'
+    te = [similarity_res,symmetry_res]
+    print(te)
+    te = [list(row) for row in zip(*te)]
+    print(te)
+    # data = np.random.random((2000, 2))
+    # data = data.tolist()
+
+    draw_hexbin(x, y, te)
+
     # for i in range(len(levels)):
     #     for j in range(i + 1, len(levels)):
     #         result += KL.KL_Divergence_2d(levels[i], levels[j], 2)
-    result = KL.KL_Divergence_2d(levels[0], levels[1], 2)
-    result2 = KL.KL_Divergence_2d(levels[0], levels[2], 2)
-    result3 = KL.KL_Divergence_2d(levels[1], levels[2], 2)
-    print(result)
-
-    print("平均KL-divergence:{0} , {1}, {2}".format(result, result2, result3))
+    # result = kl.KL_Divergence_2d(levels[0], levels[1], 2)
+    # result2 = kl.KL_Divergence_2d(levels[0], levels[2], 2)
+    # result3 = kl.KL_Divergence_2d(levels[1], levels[2], 2)
+    # print(result)
+    #
+    # print("平均KL-divergence:{0} , {1}, {2}".format(result, result2, result3))

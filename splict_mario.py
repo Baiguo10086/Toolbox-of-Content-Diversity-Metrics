@@ -8,7 +8,7 @@ from typing import Union, List, Dict
 from itertools import product
 from divtools.model.game_level_2d import GameLevel2D
 
-PROJ_DIR='d:/Desktop/Toolbox-of-Content-Diversity-Metrics'
+PROJ_DIR = 'C:/Users/hui/Desktop/toolbox/Toolbox-of-Content-Diversity-Metrics'
 class MarioLevel:
     tex_size = 16
     height = 14

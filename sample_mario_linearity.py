@@ -10,6 +10,7 @@ from divtools.model.game_level_2d import GameLevel2D
 from divtools.common.utils import calculate_linear_regression_least_squares
 
 PROJ_DIR='d:/Desktop/Toolbox-of-Content-Diversity-Metrics'
+
 class MarioLevel:
     tex_size = 16
     height = 14
