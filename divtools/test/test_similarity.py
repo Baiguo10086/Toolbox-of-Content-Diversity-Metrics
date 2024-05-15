@@ -1,7 +1,7 @@
 from divtools.model.game_level_2d import GameLevel2D
-from divtools.common.similarity import get_similar_rows
-from divtools.common.similarity import get_similar_cols
-from divtools.common.similarity import similarity
+from similarity import get_similar_rows
+from similarity import get_similar_cols
+from similarity import similarity
 
 
 class Test_Similarity:

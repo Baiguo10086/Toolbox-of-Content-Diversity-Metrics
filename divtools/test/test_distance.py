@@ -25,6 +25,6 @@ class Test_distance():
 
         def difference_fn(obj1,obj2):
             return 1 if obj1!=obj2 else 0
-        print(calculate_minimum_edit_distance(trace1,trace2,difference_fn))
+        # print(calculate_minimum_edit_distance(trace1,trace2,difference_fn))
         assert calculate_constraint_minimum_edit_distance(trace1,trace2,difference_fn,limit=1)==6
     

@@ -1,7 +1,8 @@
+import pytest
 from divtools.model.game_level_2d import GameLevel2D
 from collections import Counter
 from divtools.diversity.kl import find_pattern
-from divtools.diversity.kl import KL_Divergence_2d
+from divtools.diversity.kl import kl_divergence_2d
 
 
 class Test_KL:
@@ -35,8 +36,8 @@ class Test_KL:
                                      [2, 5, 4],
                                      [2, 2, 6]])
 
-        assert KL_Divergence_2d(sample_level2, sample_level1, 2) - 144.1 < 0.1
-        assert KL_Divergence_2d(sample_level1, sample_level2, 2) == 0
+        assert kl_divergence_2d(sample_level2, sample_level1, 2) - 144.1 < 0.1
+        assert kl_divergence_2d(sample_level1, sample_level2, 2) == 0
 
-        assert KL_Divergence_2d(sample_level2, sample_level4, 2) - 108.1 < 0.1
-        assert KL_Divergence_2d(sample_level1, sample_level4, 2) - 36.0 < 0.1
+        assert kl_divergence_2d(sample_level2, sample_level4, 2) - 108.1 < 0.1
+        assert kl_divergence_2d(sample_level1, sample_level4, 2) - 36.0 < 0.1

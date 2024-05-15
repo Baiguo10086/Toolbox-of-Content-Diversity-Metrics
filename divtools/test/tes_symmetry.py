@@ -1,7 +1,7 @@
 from divtools.model.game_level_2d import GameLevel2D
-from divtools.common.symmetry import horizontal_symmetry
-from divtools.common.symmetry import vertical_symmetry
-from divtools.common.symmetry import total_symmetry
+from symmetry import horizontal_symmetry
+from symmetry import vertical_symmetry
+from symmetry import total_symmetry
 
 
 class Test_Symmetry:
